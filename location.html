@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Cambria, sans-serif;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #bfdefd;
+            overflow: hidden;
+            background-image: url('kingfisher.jpg');
+            background-size: 800px;
+            background-position: left;
+            background-repeat: no-repeat;
+            margin: 0;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-form {
+            width: 300px;
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #003a74;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+        }
+
+        p {
+            text-align: center;
+            color: #3498db;
+        }
+
+        a {
+            font-weight: bold;
+        }
+
+        #map {
+            height: 200px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background-color: #003a74;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px; /* Adjusted font size for better fit */
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="login-form">
+            <img src="slsu.png" alt="Logo" class="logo" width="200">
+            <div id="map"></div>
+            <button id="locationButton" class="btn" onclick="showLocation()">Open Location</button>
+            <form id="signupForm" action="store_location.php" method="post">
+                <input type="hidden" id="address" name="address">
+                <input type="submit" id="proceedButton" class="btn" style="display: none;" value="Proceed">
+            </form>
+            <a href="welcomepage.html" style="color: #003a74;">&#8592; Back</a>
+        </div>
+    </div>
+
+    <!-- Load Leaflet -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let userMarker;
+
+        function initMap() {
+            map = L.map('map').setView([10.3367, 124.9491], 15); // Centered in Looc, Tomas Oppus
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
+
+        function showLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(displayLocation, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function displayLocation(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            // Reverse geocoding to get address
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                .then(response => response.json())
+                .then(data => {
+                    const address = data.display_name;
+
+                    // Update map center and marker
+                    const userLocation = [latitude, longitude];
+                    map.setView(userLocation, 15);
+
+                    if (userMarker) {
+                        userMarker.setLatLng(userLocation);
+                    } else {
+                        userMarker = L.marker(userLocation).addTo(map)
+                            .bindPopup(`You are here: ${address}`)
+                            .openPopup();
+                    }
+
+                    document.getElementById("address").value = address;
+
+                    // Show the proceed button
+                    document.getElementById("proceedButton").style.display = "block";
+                });
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        // Initialize the map
+        window.onload = initMap;
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        body {
+            font-family: Cambria, sans-serif;
+            text-align: left;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #bfdefd;
+            overflow: hidden;
+            background-image: url('kingfisher.jpg');
+            background-size: 800px;
+            background-position: left;
+            background-repeat: no-repeat;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-form {
+            width: 300px;
+            text-align: left;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        img.logo {
+            margin: 0 auto 10px;
+            display: block;
+        }
+
+        h3 {
+            color: #003a74;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"],
+        select,
+        label {
+            width: 100%;
+            padding: 5px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 5px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+
+        input[type="button"] {
+            background-color: #003a74;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+            color: #3498db;
+        }
+
+        a {
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+            display: none;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="login-form">
+            <img src="slsu.png" alt="Logo" class="logo" width="200">
+            <h3>Sign Up</h3>
+
+            <div id="error-message" class="error-message"></div>
+
+            <form id="signup-form">
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" name="full_name" placeholder="Full Name" required>
+                <label for="id-number">ID Number</label>
+                <input type="text" id="id-number" name="id_number" placeholder="ID Number" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex" required>
+                    <option value="" disabled selected>Select your sex</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob" required>
+                <label for="program">Program</label>
+                <input type="text" id="program" name="program" placeholder="Program" required>
+                <input type="button" value="Next" onclick="submitForm()">
+            </form>
+
+            <p style="color:#003a74;">Already have an account? <a href="welcomepage.html" style="color: #003a74;">Log In</a></p>
+        </div>
+    </div>
+
+    <script>
+        function submitForm() {
+            var form = document.getElementById('signup-form');
+            var formData = new FormData(form);
+            var errorMessage = document.getElementById('error-message');
+            
+            var requiredFields = ['full_name', 'id_number', 'password', 'sex', 'dob', 'program'];
+            for (var field of requiredFields) {
+                if (!form[field].value) {
+                    errorMessage.textContent = "Please fill out all fields.";
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+            }
+
+            fetch('process_signup.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    errorMessage.textContent = data.message;
+                    errorMessage.style.display = 'block';
+                } else {
+                    window.location.href = 'location.html?status=success';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+
+</html>

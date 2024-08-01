@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Cambria, sans-serif;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #bfdefd;
+            overflow: hidden;
+            background-image: url('kingfisher.jpg');
+            background-size: 800px;
+            background-position: left;
+            background-repeat: no-repeat;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .login-form {
+            width: 300px;
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+        input[type="button"] {
+            background-color: #003a74;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            text-align: center;
+        }
+        p {
+            text-align: center;
+            color: #3498db;
+        }
+        a {
+            font-weight: bold;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .eye-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: grey;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="login-form">
+            <img src="slsu.png" alt="Logo" class="logo" width="200">
+            <h1 style="color: #003a74;">Welcome</h1>
+            <p><strong style="color: #003a74;">Log In</strong></p>
+
+            <form id="loginForm">
+                <input type="text" id="id_number" placeholder="ID Number" required>
+                <br>
+                <!-- Password input field with eye icon -->
+                <div style="position: relative;">
+                    <input type="password" id="password" placeholder="Password" required>
+                    <span id="eyeIcon" class="eye-icon" onclick="togglePasswordVisibility()">🔒</span>
+                </div>
+                <div id="error-message" class="error-message"></div>
+                <br>
+                <input type="button" value="Log In" onclick="validateLogin()">
+            </form>
+
+            <p style="color:#003a74;">Don't have an account yet? <a href="signup.html" style="color: #003a74;">Sign Up</a></p>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            var passwordField = document.getElementById("password");
+            var eyeIcon = document.getElementById("eyeIcon");
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                eyeIcon.textContent = "👁️";
+                eyeIcon.style.color = "black";
+            } else {
+                passwordField.type = "password";
+                eyeIcon.textContent = "🔒";
+                eyeIcon.style.color = "grey";
+            }
+        }
+
+        function validateLogin() {
+            var idNumber = document.getElementById("id_number").value;
+            var password = document.getElementById("password").value;
+            var errorMessage = document.getElementById("error-message");
+
+            var formData = new FormData();
+            formData.append("id_number", idNumber);
+            formData.append("password", password);
+
+            fetch('process_login.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    errorMessage.textContent = data.message;
+                } else {
+                    window.location.href = "location.html"; // Redirect to location.html on successful login
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
+

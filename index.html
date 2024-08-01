@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        #text-input {
+            padding: 10px;
+            font-size: 1.1em;
+            width: 60%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            color: white;
+            background-color: #007BFF; /* Blue color */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        #qr-code {
+            margin-top: 20px;
+        }
+        p {
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>QR Code Generator</h1>
+    <input type="text" id="text-input" placeholder="Enter student ID number" size="50">
+    <button onclick="generateQRCode()">Generate QR Code</button>
+    <button onclick="saveQRCode()">Save QR Code</button>
+    <div id="qr-code"></div>
+
+    <!-- Include qrcode.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+    <script>
+        function generateQRCode() {
+            const text = document.getElementById('text-input').value;
+            const qrCodeContainer = document.getElementById('qr-code');
+            
+            // Clear previous QR code
+            qrCodeContainer.innerHTML = '';
+
+            if (text.trim() === '') {
+                qrCodeContainer.innerHTML = '<p style="color: red;">Please enter some text to generate the QR code.</p>';
+                return;
+            }
+
+            // Generate new QR code with increased size
+            QRCode.toCanvas(document.createElement('canvas'), text, { width: 256, height: 256 }, function (error, canvas) {
+                if (error) {
+                    console.error(error);
+                    qrCodeContainer.innerHTML = '<p style="color: red;">An error occurred while generating the QR code.</p>';
+                    return;
+                }
+                // Append the canvas element to the QR code container
+                qrCodeContainer.appendChild(canvas);
+            });
+        }
+
+        function saveQRCode() {
+            const qrCodeContainer = document.getElementById('qr-code');
+            const canvas = qrCodeContainer.querySelector('canvas');
+
+            if (canvas) {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'qr-code.png';
+                link.click();
+            } else {
+                alert('Please generate a QR code first.');
+            }
+        }
+    </script>
+</body>
+</html>
